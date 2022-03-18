@@ -1,4 +1,5 @@
 const express  = require("express");
+//const { captureRejectionSymbol } = require("node-cron/src/task");
 const app = express();
 const connect = require("./config/db");
 const List = require("./model/list");
@@ -56,14 +57,24 @@ app.get("/list/:dateTime", async (req, res) =>{
 
     try{
 
-        setTimeout(async function() {
+        const list = await List.find({dateTime: req.params.dateTime}).lean().exec()
 
-            const list = await List.findOne({dateTime: req.params.dateTime}).lean().exec()
+        let text = list[0].text
 
-            res.send(list)
+            
+         let num = text.slice(4).toLowerCase().split("").reverse().join("")
+        //  console.log(num + "txet")
+
+        //console.log(list)
+
+        res.send(list)
 
 
-        }, 7*1000)
+         setTimeout(async function() {
+
+            console.log(num + "txet")
+
+         }, 7*1000)
 
     }
     catch(e){
@@ -72,19 +83,8 @@ app.get("/list/:dateTime", async (req, res) =>{
 })
 
 
-// app.get('/filter/dateTime', async(req, res) =>{
-//     try{
-//         const list = List.find().filter(List => List.dateTime === req.params.dateTime)
-//         res.status(201).send(list)
-//     }
-//     catch(e){
-//         res.status(500).json({message: e.message})
-//     }
-// })
 
 
-// const connect = require("./config/db");
-// const list = require("./model/list");
 
 app.listen(2360, async () => {
     await connect();
