@@ -1,6 +1,7 @@
 const express  = require("express");
-const List = require("./model/list")
 const app = express();
+const connect = require("./config/db");
+const List = require("./model/list");
 
 app.use(express.json())
 
@@ -32,7 +33,7 @@ app.post("/",  async(req, res)=>{
         console.log(num + "txet")
         res.status(201).send(list)
 
-        }, text.length*1000);
+        }, 1*1000);
 
     }
     catch(e){
@@ -40,7 +41,7 @@ app.post("/",  async(req, res)=>{
     }
 })
 
-app.get("/list", async(req, res)=> {
+app.get("/", async(req, res)=> {
     try{
         const list = await List.find({},{_id:0}).lean().exec();
         res.status(201).send(list)
@@ -50,22 +51,20 @@ app.get("/list", async(req, res)=> {
     }
 })
 
-app.get("/list/dateTime", async (req, res)=>{
-    try{
-        const date = await List.obj.dateTime
-        const list = date.filter(date => date.dateTime === req.params.dateTime)
-        console.log(list)
-        res.send(list)
-    }
-    catch(e){
-        res.status(501).jsonp({message: e.messaeg})
-    }
-})
 
-app.get('/filter/dateTime', async(req, res) =>{
+app.get("/list/:dateTime", async (req, res) =>{
+
     try{
-        const list = List.find().filter(List => List.dateTime === req.params.dateTime)
-        res.status(201).send(list)
+
+        setTimeout(async function() {
+
+            const list = await List.findOne({dateTime: req.params.dateTime}).lean().exec()
+
+            res.send(list)
+
+
+        }, 7*1000)
+
     }
     catch(e){
         res.status(500).json({message: e.message})
@@ -73,8 +72,19 @@ app.get('/filter/dateTime', async(req, res) =>{
 })
 
 
-const connect = require("./config/db");
-const list = require("./model/list");
+// app.get('/filter/dateTime', async(req, res) =>{
+//     try{
+//         const list = List.find().filter(List => List.dateTime === req.params.dateTime)
+//         res.status(201).send(list)
+//     }
+//     catch(e){
+//         res.status(500).json({message: e.message})
+//     }
+// })
+
+
+// const connect = require("./config/db");
+// const list = require("./model/list");
 
 app.listen(2360, async () => {
     await connect();
